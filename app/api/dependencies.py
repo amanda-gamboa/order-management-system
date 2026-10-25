@@ -8,6 +8,15 @@ from app.core.database import SessionLocal
 
 
 def get_session() -> Generator[Session]:
+    """Provide a SQLAlchemy session with transaction management.
+
+    Yields:
+        A SQLAlchemy session for database operations.
+
+    The transaction is committed if the operations succeed
+    or rolled back if an exception occurs.
+    """
+
     with SessionLocal.begin() as session:
         yield session
 

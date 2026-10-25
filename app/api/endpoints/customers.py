@@ -14,6 +14,16 @@ router = APIRouter(
 def create_customer_endpoint(
     customer: CustomerCreate, session: SessionDep
 ) -> CustomerResponse:
+    """Create a new customer.
+
+    Args:
+        customer: Validated customer data provided in the request body.
+        session: SQLAlchemy session used to persist the customer in the database.
+
+    Returns:
+        The newly created customer, including its ID and creation timestamp.
+    """
+
     return create_customer(session, customer)
 
 
@@ -23,4 +33,14 @@ def create_customer_endpoint(
 def create_customers_endpoint(
     customers: list[CustomerCreate], session: SessionDep
 ) -> list[CustomerResponse]:
+    """Create multiple customers in a single request.
+
+    Args:
+        customers: Validated customer data provided in the request body.
+        session: SQLAlchemy session used to persist the customers in the database.
+
+    Returns:
+        A list of newly created customers, including their IDs and creation timestamps.
+    """
+
     return create_customers(session, customers)

@@ -15,8 +15,8 @@ from .base import Base
 
 
 class Customer(Base):
-    """
-    Represents a registered customer.
+    """Represents a registered customer.
+
     Stores personal identification, contact details, and account status.
     """
 

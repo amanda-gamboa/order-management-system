@@ -14,8 +14,7 @@ from .base import Base
 
 
 class OrderProduct(Base):
-    """
-    Represents a product line within an order.
+    """Represents a product line within an order.
 
     Acts as an association table between Order and Product,
     recording the purchased quantity and the unit price at the time

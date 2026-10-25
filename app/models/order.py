@@ -17,8 +17,8 @@ from .base import Base
 
 
 class Order(Base):
-    """
-    Represents an order placed by a customer.
+    """Represents an order placed by a customer.
+
     Stores its creation date and financial totals.
     The discount field represents a monetary amount.
     """

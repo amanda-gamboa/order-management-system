@@ -15,8 +15,8 @@ from .base import Base
 
 
 class Product(Base):
-    """
-    Represents a digital product in the catalog.
+    """Represents a digital product in the catalog.
+
     Stores its name, type, current price and active status.
     """
 
