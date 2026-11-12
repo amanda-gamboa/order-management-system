@@ -5,7 +5,7 @@ import os
 from sqlalchemy import URL, create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.core.config import DB_HOST, DB_PASSWORD, DB_PORT, DB_USER, DB_NAME
+from app.core.config import DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER
 
 TEST_DB_NAME = os.getenv("TEST_DB_NAME")
 
@@ -24,13 +24,11 @@ TEST_DATABASE_URL = URL.create(
     database=TEST_DB_NAME,
 )
 
-
 test_engine = create_engine(
     TEST_DATABASE_URL,
     echo=False,
     pool_pre_ping=True,
 )
-
 
 TestingSessionLocal = sessionmaker(
     bind=test_engine,

@@ -1,8 +1,10 @@
-from fastapi import APIRouter, status, HTTPException
+"""Define API endpoints for customer operations."""
+
+from fastapi import APIRouter, HTTPException, status
 from sqlalchemy.exc import IntegrityError
 
-from app.schemas.customer import CustomerCreate, CustomerResponse
 from app.api.dependencies import SessionDep
+from app.schemas.customer import CustomerCreate, CustomerResponse
 from app.services.customer_service import create_customer, create_customers
 
 router = APIRouter(

@@ -1,12 +1,12 @@
-from typing import Any
+"""Test customer API integration."""
 
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 
-from database import TestingSessionLocal
 from app.models.customer import Customer
 from app.schemas.customer import CustomerCreate, CustomerResponse
+from tests.integration.database import TestingSessionLocal
 
 INVALID_CUSTOMER_DATA = [
     ("first_name", "    "),
@@ -31,7 +31,7 @@ INVALID_DATA_IDS = [
 def test_create_customer_with_valid_data(
     client: TestClient, valid_customer: CustomerCreate
 ):
-    """Test successful customer creation."""
+    """Verify successful customer creation."""
 
     payload = valid_customer.model_dump(mode="json")
 
@@ -41,7 +41,7 @@ def test_create_customer_with_valid_data(
 
     customer_response = CustomerResponse.model_validate(response.json())
 
-    # Check response data
+    # Verify response data
     assert customer_response.id is not None
     assert customer_response.first_name == valid_customer.first_name
     assert customer_response.last_name == valid_customer.last_name
@@ -50,7 +50,7 @@ def test_create_customer_with_valid_data(
     assert customer_response.created_at is not None
     assert customer_response.is_active == valid_customer.is_active
 
-    # Check data persistence
+    # Verify data persistence
     with TestingSessionLocal() as session:
         db_customer = session.get(Customer, customer_response.id)
 
@@ -69,9 +69,9 @@ def test_create_customer_rejects_invalid_data(
     client: TestClient,
     valid_customer: CustomerCreate,
     field: str,
-    value: Any,
+    value: str | int | None,
 ):
-    """Test rejection of invalid customer data."""
+    """Verify rejection of invalid customer data."""
 
     payload = valid_customer.model_dump(mode="json")
     payload[field] = value
@@ -85,7 +85,7 @@ def test_create_customer_rejects_duplicate_email(
     client: TestClient,
     valid_customer: CustomerCreate,
 ):
-    """Test customer creation with an existing email."""
+    """Verify customer creation with an existing email."""
 
     existing_customer = Customer(**valid_customer.model_dump())
 
@@ -113,7 +113,7 @@ def test_create_customer_rejects_duplicate_email(
 def test_create_customers_with_valid_data(
     client: TestClient, valid_customers: list[CustomerCreate]
 ):
-    """Test successful creation of multiple customers."""
+    """Verify successful creation of multiple customers."""
 
     payload = [customer.model_dump(mode="json") for customer in valid_customers]
 
@@ -127,7 +127,7 @@ def test_create_customers_with_valid_data(
 
     assert len(customer_responses) == len(valid_customers)
 
-    # Check response data
+    # Verify response data
     for customer_response, valid_customer in zip(customer_responses, valid_customers):
         assert customer_response.id is not None
         assert customer_response.first_name == valid_customer.first_name
@@ -137,7 +137,7 @@ def test_create_customers_with_valid_data(
         assert customer_response.created_at is not None
         assert customer_response.is_active == valid_customer.is_active
 
-    # Check data persistence
+    # Verify data persistence
     with TestingSessionLocal() as session:
         db_customers = session.scalars(
             select(Customer)
@@ -162,9 +162,9 @@ def test_create_customers_rejects_invalid_data(
     client: TestClient,
     valid_customers: list[CustomerCreate],
     field: str,
-    value: Any,
+    value: str | int | None,
 ):
-    """Test rejection of invalid customer data."""
+    """Verify rejection of invalid customer data."""
 
     payload = [customer.model_dump(mode="json") for customer in valid_customers]
     payload[0][field] = value
@@ -179,7 +179,7 @@ def test_create_customers_rejects_duplicate_email(
     valid_customer: CustomerCreate,
     valid_customers: list[CustomerCreate],
 ):
-    """Test bulk customer creation with an existing email."""
+    """Verify bulk customer creation with an existing email."""
 
     existing_customer = Customer(**valid_customer.model_dump())
 
@@ -203,7 +203,7 @@ def test_create_customers_rejects_duplicate_email(
 
 
 def test_create_customers_rejects_empty_list(client: TestClient):
-    """Test bulk customer creation with an empty list."""
+    """Verify bulk customer creation with an empty list."""
 
     response = client.post("/customers/bulk", json=[])
 

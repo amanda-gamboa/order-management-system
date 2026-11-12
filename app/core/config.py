@@ -1,3 +1,5 @@
+"""Manage application configuration and environment variables."""
+
 import os
 
 from dotenv import load_dotenv
@@ -5,11 +7,20 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def get_required_env(name: str) -> str:
-    value = os.getenv(name)
+def get_required_env(env_variable_name: str) -> str:
+    """Retrieve and validate a required environment variable.
+
+    Args:
+        env_variable_name: Name of the environment variable.
+
+    Raises:
+        ValueError: If the variable is missing or empty.
+    """
+
+    value = os.getenv(env_variable_name)
 
     if value is None or not value.strip():
-        raise ValueError(f"Missing required environment variable: {name}")
+        raise ValueError(f"Missing required environment variable: {env_variable_name}")
 
     return value
 

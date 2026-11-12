@@ -1,15 +1,28 @@
+"""Test customer service operations."""
+
+from unittest.mock import Mock
+
 import pytest
 
 from app.models.customer import Customer
+from app.schemas.customer import CustomerCreate
 from app.services.customer_service import create_customer, create_customers
 
+# ------------- create_customer() ----------------
 
-def test_create_customer_with_valid_schema(session, mock_add_customers, valid_customer):
+
+def test_create_customer_with_valid_schema(
+    session: Mock,
+    mock_add_customers: Mock,
+    valid_customer: CustomerCreate,
+):
+    """Verify successful customer creation with valid input data."""
+
     created_customer = create_customer(session, valid_customer)
 
     mock_add_customers.assert_called_once()
 
-    # Check the arguments passed to the mock
+    # Verify the arguments passed to the mock
     # The customer is wrapped in a list to meet the repository's input requirements.
     passed_session, passed_customer_list = mock_add_customers.call_args.args
 
@@ -21,8 +34,7 @@ def test_create_customer_with_valid_schema(session, mock_add_customers, valid_cu
 
     assert isinstance(passed_customer, Customer)
 
-    # Check the service return value
-
+    # Verify the service return value
     assert isinstance(created_customer, Customer)
     assert created_customer is passed_customer
 
@@ -33,15 +45,21 @@ def test_create_customer_with_valid_schema(session, mock_add_customers, valid_cu
     assert created_customer.is_active == valid_customer.is_active
 
 
+# ------------- create_customers() ----------------
+
+
 def test_create_customers_with_valid_schemas(
-    session, mock_add_customers, valid_customers
+    session: Mock,
+    mock_add_customers: Mock,
+    valid_customers: list[CustomerCreate],
 ):
+    """Verify successful bulk customer creation with valid input data."""
+
     created_customers = create_customers(session, valid_customers)
 
     mock_add_customers.assert_called_once()
 
-    # Check the arguments passed to the mock
-
+    # Verify the arguments passed to the mock
     passed_session, passed_customers = mock_add_customers.call_args.args
 
     assert passed_session is session
@@ -50,7 +68,7 @@ def test_create_customers_with_valid_schemas(
     for passed_customer in passed_customers:
         assert isinstance(passed_customer, Customer)
 
-    # Check the service return value
+    # Verify the service return value
     assert isinstance(created_customers, list)
     assert created_customers is passed_customers
     for created_customer in created_customers:
@@ -64,7 +82,8 @@ def test_create_customers_with_valid_schemas(
         assert created_customer.is_active == valid_customer.is_active
 
 
-def test_create_customers_with_empty_list(session):
+def test_create_customers_with_empty_list(session: Mock):
+    """Verify that an empty customer list raises ValueError."""
 
     with pytest.raises(ValueError, match="Customer list is empty"):
         create_customers(session, [])

@@ -1,6 +1,9 @@
-from pydantic import BaseModel, Field, EmailStr, field_validator
-from pydantic_extra_types.phone_numbers import PhoneNumber
+"""Define Pydantic schemas for customer data validation."""
+
 from datetime import datetime
+
+from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic_extra_types.phone_numbers import PhoneNumber
 
 
 class CustomerCreate(BaseModel):
@@ -19,7 +22,7 @@ class CustomerCreate(BaseModel):
 
     @field_validator("first_name", "last_name")
     @classmethod
-    def validate_empty_spaces(cls, value: str) -> str:
+    def validate_and_strip_names(cls, value: str) -> str:
         if not value.strip():
             raise ValueError("This field cannot be empty or contain only spaces")
         return value.strip()

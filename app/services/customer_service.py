@@ -1,3 +1,5 @@
+"""Implement business logic for customer operations."""
+
 from sqlalchemy.orm import Session
 
 from app.models.customer import Customer

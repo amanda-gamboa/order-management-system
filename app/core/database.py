@@ -1,13 +1,9 @@
+"""Configure the database engine and session factory."""
+
 from sqlalchemy import URL, create_engine
 from sqlalchemy.orm import sessionmaker
 
-from .config import (
-    DB_USER,
-    DB_PASSWORD,
-    DB_HOST,
-    DB_PORT,
-    DB_NAME,
-)
+from .config import DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER
 
 DATABASE_URL = URL.create(
     drivername="mysql+pymysql",

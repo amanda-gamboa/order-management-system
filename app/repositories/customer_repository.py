@@ -1,3 +1,5 @@
+"""Handle customer database persistence operations."""
+
 from sqlalchemy.orm import Session
 
 from app.models.customer import Customer

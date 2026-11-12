@@ -1,12 +1,18 @@
+"""Provide shared fixtures for testing."""
+
+from collections.abc import Generator
+from unittest.mock import Mock, patch
+
 import pytest
 from sqlalchemy.orm import Session
-from unittest.mock import Mock, patch
 
 from app.schemas.customer import CustomerCreate
 
 
 @pytest.fixture
-def valid_customer():
+def valid_customer() -> CustomerCreate:
+    """Provide a valid customer creation schema."""
+
     return CustomerCreate(
         first_name="Laura",
         last_name="Martínez",
@@ -17,7 +23,9 @@ def valid_customer():
 
 
 @pytest.fixture
-def valid_customers():
+def valid_customers() -> list[CustomerCreate]:
+    """Provide multiple valid customer creation schemas."""
+
     return [
         CustomerCreate(
             first_name="Laura",
@@ -44,7 +52,9 @@ def valid_customers():
 
 
 @pytest.fixture
-def customer_mandatory_data():
+def customer_mandatory_data() -> dict[str, str]:
+    """Provide the mandatory fields for customer creation."""
+
     return {
         "first_name": "Laura",
         "last_name": "Martínez",
@@ -53,12 +63,16 @@ def customer_mandatory_data():
 
 
 @pytest.fixture
-def session():
+def session() -> Mock:
+    """Provide a mock database session."""
+
     return Mock(spec=Session)
 
 
 @pytest.fixture
-def mock_add_customers():
+def mock_add_customers() -> Generator[Mock, None, None]:
+    """Mock the customer repository function for unit testing."""
+
     with patch(
         "app.services.customer_service.add_customers",
         side_effect=lambda session, customers: customers,

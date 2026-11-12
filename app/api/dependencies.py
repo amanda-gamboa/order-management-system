@@ -1,13 +1,15 @@
+"""Provide shared dependencies for API endpoints."""
+
 from collections.abc import Generator
+from typing import Annotated
 
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from typing import Annotated
 
 from app.core.database import SessionLocal
 
 
-def get_session() -> Generator[Session]:
+def get_session() -> Generator[Session, None, None]:
     """Provide a SQLAlchemy session with transaction management.
 
     Yields:

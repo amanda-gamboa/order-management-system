@@ -1,14 +1,10 @@
+"""Define the Customer ORM model and its relationships."""
+
 from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import (
-    Boolean,
-    DateTime,
-    Integer,
-    String,
-    func,
-)
+from sqlalchemy import Boolean, DateTime, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base

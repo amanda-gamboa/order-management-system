@@ -1,13 +1,10 @@
+"""Define the association model linking orders and products."""
+
 from __future__ import annotations
 
 from decimal import Decimal
 
-from sqlalchemy import (
-    CheckConstraint,
-    ForeignKey,
-    Integer,
-    Numeric,
-)
+from sqlalchemy import CheckConstraint, ForeignKey, Integer, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base

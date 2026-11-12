@@ -1,7 +1,6 @@
 """Initialize the application database."""
 
 import app.models
-
 from app.core.database import engine
 from app.models.base import Base
 

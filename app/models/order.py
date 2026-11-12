@@ -1,16 +1,11 @@
+"""Define the Order ORM model and its relationships."""
+
 from __future__ import annotations
 
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import (
-    CheckConstraint,
-    DateTime,
-    ForeignKey,
-    Integer,
-    Numeric,
-    func,
-)
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Integer, Numeric, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
