@@ -4,9 +4,9 @@ from logging.config import fileConfig
 
 from alembic import context
 
+import app.models
 from app.core.database import engine
 from app.models.base import Base
-import app.models
 
 config = context.config
 
@@ -36,6 +36,7 @@ def run_migrations_offline() -> None:
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
         compare_type=True,
+        compare_server_default=True,
     )
 
     with context.begin_transaction():
@@ -54,6 +55,7 @@ def run_migrations_online() -> None:
             connection=connection,
             target_metadata=target_metadata,
             compare_type=True,
+            compare_server_default=True,
         )
 
         with context.begin_transaction():
