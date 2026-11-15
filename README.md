@@ -1,6 +1,8 @@
 # Order Management System
 
-A backend order management API built with Python, FastAPI, Pydantic, SQLAlchemy, and MySQL. The project manages customers, products, and orders, with a focus on relational database integrity and a layered application architecture.
+A backend order management API built with Python, FastAPI, Pydantic, SQLAlchemy, and MySQL. The project is designed to manage online orders for digital products, including customer management, product catalog, and order processing.
+
+The application focuses on relational database integrity and a layered architecture. Its scope does not include physical inventory management, warehouse stock tracking, or shipping operations.
 
 ## Overview
 
@@ -17,6 +19,7 @@ The API is currently under development.
 - **Pydantic** — Request validation and response schemas.
 - **SQLAlchemy** — ORM and database interaction.
 - **MySQL** — Relational database.
+- **pytest** — Unit and integration testing.
 - **Git and GitHub** — Version control and source code management.
 
 ## Architecture
@@ -29,14 +32,15 @@ app/
 │   ├── endpoints/
 │   └── dependencies.py
 ├── core/
-│   ├── config.py
-│   └── database.py
 ├── models/
 ├── schemas/
 ├── repositories/
 ├── services/
 ├── init_db.py
 └── main.py
+tests/
+├── unit/
+└── integration/
 ```
 
 ### Layer Responsibilities
@@ -50,6 +54,8 @@ app/
 - **Services:** Coordinate business logic and data access.
 - **Database Initialization:** Creates database tables that do not already exist.
 - **Main Application:** Initializes the FastAPI application and registers its routers.
+- **Unit Tests:** Test individual components in isolation.
+- **Integration Tests:** Verify interactions between application components and the database.
 
 This separation of responsibilities makes the application easier to maintain and extend.
 
@@ -62,6 +68,7 @@ The database uses a relational model consisting of four main entities.
 Represents a customer.
 
 The model includes:
+
 - Unique identifier.
 - First and last name.
 - Unique email address.
@@ -71,9 +78,10 @@ The model includes:
 
 ### Product
 
-Represents a product available for inclusion in orders.
+Represents a digital product available for inclusion in orders.
 
 The model includes:
+
 - Unique identifier.
 - Name.
 - Product type.
@@ -87,6 +95,7 @@ A database constraint prevents negative product prices.
 Represents an order placed by a customer.
 
 The model includes:
+
 - Unique identifier.
 - Customer reference.
 - Creation timestamp.
@@ -101,6 +110,7 @@ Each order references a customer through a foreign key. Database constraints enf
 Represents a product included in an order.
 
 The model includes:
+
 - Order reference.
 - Product reference.
 - Quantity.
@@ -235,9 +245,18 @@ Pydantic validates the request data, and the service and repository layers coord
 
 ## Testing
 
-Automated tests using pytest are planned.
+The project includes automated unit and integration tests using pytest.
 
-The test suite will cover implemented functionality, including request validation and database operations.
+The test suite currently covers customer schema validation, service logic, and API integration, including:
+
+- Successful customer creation.
+- Successful bulk customer creation.
+- Request data validation.
+- Duplicate email handling.
+- Empty bulk creation requests.
+- Database persistence and data integrity.
+
+Integration tests use a dedicated test database to verify database operations without affecting the application database.
 
 ## Project Status
 
@@ -252,6 +271,7 @@ The project is under active development.
 - Pydantic request and response schemas for customer creation.
 - Customer creation endpoint.
 - Bulk customer creation endpoint.
+- Unit and integration tests using pytest.
 
 ### Planned
 
@@ -259,4 +279,5 @@ The project is under active development.
 - Customer activation and deactivation.
 - Product management endpoints.
 - Order management endpoints.
-- Automated testing with pytest.
+- Database migrations with Alembic.
+- Docker configuration for containerization and deployment.
