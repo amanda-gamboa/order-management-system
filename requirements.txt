@@ -1,10 +1,11 @@
+alembic==1.20.1
+email-validator==2.3.0
+fastapi[standard]==0.143.3
+phonenumbers==9.0.41
+pydantic==2.14.1
 PyMySQL==1.2.3
+pytest==9.1.1
 python-dotenv==1.2.4
 SQLAlchemy==2.1.4
 typing-inspection==0.4.4
 typing_extensions==4.16.0
-pydantic==2.14.1
-email-validator==2.3.0
-phonenumbers==9.0.41
-fastapi[standard]==0.143.3
-pytest==9.1.1
