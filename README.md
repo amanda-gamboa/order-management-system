@@ -10,6 +10,8 @@ The application separates HTTP endpoints, business logic, data access, request v
 
 SQLAlchemy ORM models define the database structure, while relational constraints enforce data integrity at the database level.
 
+Alembic manages database schema changes through version-controlled migrations.
+
 The API is currently under development.
 
 ## Technologies
@@ -18,6 +20,7 @@ The API is currently under development.
 - **FastAPI** — REST API development.
 - **Pydantic** — Request validation and response schemas.
 - **SQLAlchemy** — ORM and database interaction.
+- **Alembic** — Database schema migrations.
 - **MySQL** — Relational database.
 - **pytest** — Unit and integration testing.
 - **Git and GitHub** — Version control and source code management.
@@ -27,20 +30,26 @@ The API is currently under development.
 The application follows a layered architecture that separates responsibilities across the following components.
 
 ```text
-app/
-├── api/
-│   ├── endpoints/
-│   └── dependencies.py
-├── core/
-├── models/
-├── schemas/
-├── repositories/
-├── services/
-├── init_db.py
-└── main.py
-tests/
-├── unit/
-└── integration/
+.
+├── app/
+│   ├── api/
+│   │   ├── endpoints/
+│   │   └── dependencies.py
+│   ├── core/
+│   ├── models/
+│   ├── repositories/
+│   ├── schemas/
+│   ├── services/
+│   └── main.py
+├── migrations/
+│   ├── env.py
+│   └── versions/
+├── tests/
+│   ├── unit/
+│   └── integration/
+├── alembic.ini
+├── requirements.txt
+└── README.md
 ```
 
 ### Layer Responsibilities
@@ -49,10 +58,10 @@ tests/
 - **Dependencies:** Provide shared dependencies, including database sessions.
 - **Core:** Contains application configuration and database connection setup.
 - **Models:** Define the database structure using SQLAlchemy ORM models.
-- **Schemas:** Validate request data and define response structures using Pydantic.
 - **Repositories:** Handle database access and persistence operations.
+- **Schemas:** Validate request data and define response structures using Pydantic.
 - **Services:** Coordinate business logic and data access.
-- **Database Initialization:** Creates database tables that do not already exist.
+- **Migrations:** Store version-controlled database schema migrations managed by Alembic.
 - **Main Application:** Initializes the FastAPI application and registers its routers.
 - **Unit Tests:** Test individual components in isolation.
 - **Integration Tests:** Verify interactions between application components and the database.
@@ -183,21 +192,19 @@ Configure the connection settings using the environment variables expected by th
 
 Use `.env.example` as a reference when configuring the environment.
 
-### 5. Initialize the Database Tables
+### 5. Apply Database Migrations
 
-The application uses SQLAlchemy ORM models to define the database schema.
+The project uses Alembic to manage database schema changes.
 
 After creating the MySQL database and configuring the connection, run the following command from the repository root:
 
 ```bash
-python -m app.init_db
+alembic upgrade head
 ```
 
-This command creates the database tables that do not already exist, based on the registered SQLAlchemy models.
+This applies all pending migrations and brings the database schema up to the latest revision.
 
-The MySQL database itself must exist before running this command.
-
-This initialization procedure does not update existing tables when the models change.
+Alembic creates the tables and tracks the applied migration versions in the `alembic_version` table.
 
 ### 6. Run the Application
 
@@ -267,7 +274,7 @@ The project is under active development.
 - Layered application architecture.
 - SQLAlchemy database models and relational constraints.
 - Database connection and environment configuration.
-- Database table initialization.
+- Database schema migrations using Alembic.
 - Pydantic request and response schemas for customer creation.
 - Customer creation endpoint.
 - Bulk customer creation endpoint.
@@ -279,5 +286,4 @@ The project is under active development.
 - Customer activation and deactivation.
 - Product management endpoints.
 - Order management endpoints.
-- Database migrations with Alembic.
 - Docker configuration for containerization and deployment.
