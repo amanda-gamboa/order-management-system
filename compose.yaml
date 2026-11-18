@@ -1,0 +1,101 @@
+services:
+
+  # MySQL database
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+
+    ports:
+      - "${DB_HOST_PORT}:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+
+  # FastAPI application
+  api:
+    build: .
+    image: order-management-api:1.0
+    restart: unless-stopped
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    ports:
+      - "8000:8000"
+
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+
+    volumes:
+      - ./app:/workspace/app
+      - ./migrations:/workspace/migrations
+      - ./alembic.ini:/workspace/alembic.ini
+
+    command:
+      [
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+        "--reload"
+      ]
+
+
+  # Automated tests
+  test:
+    build: .
+    image: order-management-api:1.0
+
+    profiles:
+      - test
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      TEST_DB_NAME: ${TEST_DB_NAME}
+
+    volumes:
+      - ./app:/workspace/app
+      - ./tests:/workspace/tests
+      - ./migrations:/workspace/migrations
+      - ./alembic.ini:/workspace/alembic.ini
+
+    command: ["python", "-m", "pytest", "-v"]
+
+
+# Persistent MySQL data
+volumes:
+  mysql_data:
