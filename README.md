@@ -23,6 +23,7 @@ The API is currently under development.
 - **Alembic** — Database schema migrations.
 - **MySQL** — Relational database.
 - **pytest** — Unit and integration testing.
+- **Docker** — Application containerization and multi-container development environment using Docker Compose.
 - **Git and GitHub** — Version control and source code management.
 
 ## Architecture
@@ -41,18 +42,20 @@ The application follows a layered architecture that separates responsibilities a
 │   ├── schemas/
 │   ├── services/
 │   └── main.py
+├── docker/
+│   └── mysql/
+│       └── init/
+│           └── init_test_db.sql
 ├── migrations/
 │   ├── env.py
 │   └── versions/
-├── tests/
-│   ├── unit/
-│   └── integration/
-├── alembic.ini
-├── requirements.txt
-└── README.md
+└── tests/
+    ├── unit/
+    └── integration/
+
 ```
 
-### Layer Responsibilities
+### Component Responsibilities
 
 - **API Endpoints:** Define HTTP routes and handle incoming requests.
 - **Dependencies:** Provide shared dependencies, including database sessions.
@@ -65,6 +68,8 @@ The application follows a layered architecture that separates responsibilities a
 - **Main Application:** Initializes the FastAPI application and registers its routers.
 - **Unit Tests:** Test individual components in isolation.
 - **Integration Tests:** Verify interactions between application components and the database.
+- **Docker Configuration:** Defines the application and database containers, their configuration, networking, and persistent storage using Docker and Docker Compose.
+- **Database Initialization:** Contains the MySQL initialization script used to create the dedicated testing database and grant the required permissions.
 
 This separation of responsibilities makes the application easier to maintain and extend.
 
@@ -143,22 +148,32 @@ These constraints enforce data integrity at the database level rather than relyi
 
 ## Requirements
 
-To run the application locally, you will need:
+The project can be run locally or through Docker.
+
+For local execution, you will need:
 
 - Python.
 - MySQL.
 - The dependencies listed in `requirements.txt`.
 
+For Docker-based execution, you will need:
+
+- Docker with Docker Compose.
+
+Python and MySQL do not need to be installed locally when using Docker, as the application and database run inside containers.
+
 ## Installation and Setup
 
-### 1. Clone the Repository
+### Local Setup
+
+#### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/amanda-gamboa/order-management-system
 cd order-management-system
 ```
 
-### 2. Create a Virtual Environment
+#### 2. Create a Virtual Environment
 
 ```bash
 python -m venv .venv
@@ -178,21 +193,23 @@ Activate the environment.
 source .venv/bin/activate
 ```
 
-### 3. Install Dependencies
+#### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configure the Database Connection
+#### 4. Configure the Database Connection
 
-Create an empty MySQL database for the application.
+Create the application database in MySQL.
 
-Configure the connection settings using the environment variables expected by the application. These settings are loaded from the `.env` file.
+```sql
+CREATE DATABASE order_management_db;
+```
 
-Use `.env.example` as a reference when configuring the environment.
+Create a `.env` file in the repository root using `.env.example` as a reference. Adjust the database connection values according to your local MySQL configuration.
 
-### 5. Apply Database Migrations
+#### 5. Apply Database Migrations
 
 The project uses Alembic to manage database schema changes.
 
@@ -206,7 +223,7 @@ This applies all pending migrations and brings the database schema up to the lat
 
 Alembic creates the tables and tracks the applied migration versions in the `alembic_version` table.
 
-### 6. Run the Application
+#### 6. Run the Application
 
 From the repository root, start the development server:
 
@@ -218,9 +235,60 @@ Once the server is running, the interactive API documentation is available at:
 
 http://127.0.0.1:8000/docs
 
+### Docker Setup
+
+#### 1. Configure Environment Variables
+
+Create your local `.env` file from the example:
+
+```bash
+cp .env.example .env
+```
+
+Update the values in `.env` according to your environment.
+
+The `.env` file contains local configuration and must not be committed to version control.
+
+#### 2. Build and Start the Containers
+
+```bash
+docker compose up -d --build
+```
+
+This command builds the API image and starts the application and MySQL containers.
+
+#### 3. Apply Database Migrations
+
+Once the database is running, apply the migrations:
+
+```bash
+docker compose exec api alembic upgrade head
+```
+
+#### 4. Access the API Documentation
+
+The interactive API documentation is available at:
+
+http://localhost:8000/docs
+
+### Docker Configuration
+
+Docker Compose manages three services:
+
+- **db:** Runs MySQL and stores database data in a volume.
+- **api:** Runs the FastAPI application using Uvicorn with automatic reload enabled for development.
+- **test:** Runs the test suite independently from the API service, using a dedicated testing database.
+
+The MySQL service includes a health check to ensure the database is ready before dependent services start.
+
+The database initialization script at `docker/mysql/init/init_test_db.sql` creates the testing database and grants the application user the required permissions.
+
+MySQL initialization scripts are executed only when the database data directory is first initialized. Subsequent container restarts do not execute these scripts again.
+
+
 ## API Endpoints
 
-The API currently supports customer creation.
+The API currently supports customer and bulk customer creation.
 
 ### Customers
 
@@ -265,6 +333,36 @@ The test suite currently covers customer schema validation, service logic, and A
 
 Integration tests use a dedicated test database to verify database operations without affecting the application database.
 
+### Running Tests Locally
+
+When running the tests without Docker, a dedicated testing database must be created manually in MySQL.
+
+It must be different from the application database.
+
+```sql
+CREATE DATABASE test_order_management_db;
+```
+
+Make sure the test configuration points to `TEST_DB_NAME` rather than the application database before running the tests.
+
+Run the test suite from the repository root:
+
+```bash
+python -m pytest -v
+```
+
+### Running Tests with Docker
+
+Docker Compose provides a dedicated test service and initializes the testing database automatically when the MySQL data directory is first created.
+
+Run the test suite with:
+
+```bash
+docker compose --profile test run --rm test
+```
+
+Both execution methods use a separate testing database to avoid affecting application data.
+
 ## Project Status
 
 The project is under active development.
@@ -279,6 +377,10 @@ The project is under active development.
 - Customer creation endpoint.
 - Bulk customer creation endpoint.
 - Unit and integration tests using pytest.
+- Dockerfile and Docker Compose configuration.
+- MySQL container with persistent data storage.
+- Dedicated testing database initialization.
+- Dockerized test execution.
 
 ### Planned
 
@@ -286,4 +388,3 @@ The project is under active development.
 - Customer activation and deactivation.
 - Product management endpoints.
 - Order management endpoints.
-- Docker configuration for containerization and deployment.
