@@ -22,7 +22,10 @@ def create_customer(session: Session, customer: CustomerCreate) -> Customer:
     """
 
     customer_model = Customer(**customer.model_dump())
+
+    # The customer is wrapped in a list to meet the repository's input requirements.
     added_customers = add_customers(session, [customer_model])
+
     session.flush()
     return added_customers[0]
 
