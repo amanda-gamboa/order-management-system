@@ -203,7 +203,7 @@ def test_create_customers_rejects_duplicate_email(
 
 
 def test_create_customers_rejects_empty_list(client: TestClient):
-    """Verify bulk customer creation with an empty list."""
+    """Verify bulk customer creation rejects an empty list."""
 
     response = client.post("/customers/bulk", json=[])
 
