@@ -1,12 +1,13 @@
 """Provide shared fixtures for testing."""
 
-from collections.abc import Generator
-from unittest.mock import Mock, patch
+from decimal import Decimal
 
 import pytest
-from sqlalchemy.orm import Session
 
 from app.schemas.customer import CustomerCreate
+from app.schemas.product import ProductCreate
+
+# CUSTOMER
 
 
 @pytest.fixture
@@ -62,19 +63,53 @@ def customer_mandatory_data() -> dict[str, str]:
     }
 
 
-@pytest.fixture
-def session() -> Mock:
-    """Provide a mock database session."""
-
-    return Mock(spec=Session)
+# PRODUCT
 
 
 @pytest.fixture
-def mock_add_customers() -> Generator[Mock, None, None]:
-    """Mock the customer repository function for unit testing."""
+def valid_product() -> ProductCreate:
+    """Provide a valid product creation schema."""
 
-    with patch(
-        "app.services.customer_service.add_customers",
-        side_effect=lambda session, customers: customers,
-    ) as mock_add_customers:
-        yield mock_add_customers
+    return ProductCreate(
+        name="Python Programming Course",
+        product_type="course",
+        price=Decimal("49.99"),
+        is_active=True,
+    )
+
+
+@pytest.fixture
+def valid_products() -> list[ProductCreate]:
+    """Provide multiple valid product creation schemas."""
+
+    return [
+        ProductCreate(
+            name="Python Programming Course",
+            product_type="course",
+            price=Decimal("49.99"),
+            is_active=True,
+        ),
+        ProductCreate(
+            name="Notion Project Planner",
+            product_type="template",
+            price=Decimal("0.00"),
+            is_active=True,
+        ),
+        ProductCreate(
+            name="Book Lovers Club",
+            product_type="membership",
+            price=Decimal("5.99"),
+            is_active=False,
+        ),
+    ]
+
+
+@pytest.fixture
+def product_mandatory_data() -> dict[str, str | Decimal]:
+    """Provide the mandatory fields for product creation."""
+
+    return {
+        "name": "Python Programming Course",
+        "product_type": "course",
+        "price": Decimal("49.99"),
+    }

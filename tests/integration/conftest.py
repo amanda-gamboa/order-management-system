@@ -1,4 +1,4 @@
-"""Fixtures for integration tests."""
+"""Provide fixtures for integration tests."""
 
 from collections.abc import Generator
 

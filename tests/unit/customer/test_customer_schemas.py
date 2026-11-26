@@ -114,7 +114,7 @@ def test_customer_response_with_valid_data(
     phone_value: str | None,
     expected_phone: str | None,
 ):
-    """Verify CustomerResponse accepts customers with and without a phone number."""
+    """Verify CustomerResponse accepts valid customer data, including optional phone numbers."""
 
     created_customer = Customer(
         id=1,
