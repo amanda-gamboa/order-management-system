@@ -41,7 +41,8 @@ The application follows a layered architecture that separates responsibilities a
 │   ├── repositories/
 │   ├── schemas/
 │   ├── services/
-│   └── main.py
+│   ├── main.py
+│   └── product_types.py
 ├── docker/
 │   └── mysql/
 │       └── init/
@@ -52,7 +53,6 @@ The application follows a layered architecture that separates responsibilities a
 └── tests/
     ├── unit/
     └── integration/
-
 ```
 
 ### Component Responsibilities
@@ -64,10 +64,11 @@ The application follows a layered architecture that separates responsibilities a
 - **Repositories:** Handle database access and persistence operations.
 - **Schemas:** Validate request data and define response structures using Pydantic.
 - **Services:** Coordinate business logic and data access.
-- **Migrations:** Store version-controlled database schema migrations managed by Alembic.
 - **Main Application:** Initializes the FastAPI application and registers its routers.
+- **Product Types:** Defines the supported product types.
 - **Unit Tests:** Test individual components in isolation.
 - **Integration Tests:** Verify interactions between application components and the database.
+- **Migrations:** Store version-controlled database schema migrations managed by Alembic.
 - **Docker Configuration:** Defines the application and database containers, their configuration, networking, and persistent storage using Docker and Docker Compose.
 - **Database Initialization:** Contains the MySQL initialization script used to create the dedicated testing database and grant the required permissions.
 
@@ -100,6 +101,7 @@ The model includes:
 - Name.
 - Product type.
 - Price.
+- Creation timestamp.
 - Active status.
 
 A database constraint prevents negative product prices.
@@ -285,10 +287,9 @@ The database initialization script at `docker/mysql/init/init_test_db.sql` creat
 
 MySQL initialization scripts are executed only when the database data directory is first initialized. Subsequent container restarts do not execute these scripts again.
 
-
 ## API Endpoints
 
-The API currently supports customer and bulk customer creation.
+The API currently supports customer and product creation, including bulk creation.
 
 ### Customers
 
@@ -297,36 +298,72 @@ The API currently supports customer and bulk customer creation.
 Creates a new customer.
 
 - **Method:** `POST`
+- **Endpoint:** `/customers/`
 - **Request Schema:** `CustomerCreate`
 - **Success Status:** `201 Created`
 - **Response Schema:** `CustomerResponse`
 
 Pydantic validates the incoming request data before the service layer processes it.
 
-The response includes the generated customer identifier and the fields defined by the response schema.
+The response includes the generated customer identifier and other fields defined by the response schema.
 
 #### Create Multiple Customers
 
 Creates multiple customers in a single request.
 
 - **Method:** `POST`
+- **Endpoint:** `/customers/bulk`
 - **Request Body:** A list of customer creation objects
 - **Success Status:** `201 Created`
 - **Response Schema:** A list of `CustomerResponse` objects
 
 Pydantic validates the request data, and the service and repository layers coordinate the creation and persistence of the customers.
 
-**Additional customer operations and product and order endpoints will be documented as they are implemented.**
+### Products
+
+#### Create a Product
+
+Creates a new digital product.
+
+- **Method:** `POST`
+- **Endpoint:** `/products/`
+- **Request Schema:** `ProductCreate`
+- **Success Status:** `201 Created`
+- **Response Schema:** `ProductResponse`
+
+Pydantic validates the incoming request data before the service layer processes it.
+
+The response includes the generated product identifier and other fields defined by the response schema.
+
+#### Create Multiple Products
+
+Creates multiple digital products in a single request.
+
+- **Method:** `POST`
+- **Endpoint:** `/products/bulk`
+- **Request Body:** A list of product creation objects
+- **Success Status:** `201 Created`
+- **Response Schema:** A list of `ProductResponse` objects
+
+Pydantic validates each product in the request. The service and repository layers coordinate the creation and persistence of the products.
+
+Empty bulk creation requests are rejected.
+
+**Additional operations will be documented as they are implemented.**
 
 ## Testing
 
 The project includes automated unit and integration tests using pytest.
 
-The test suite currently covers customer schema validation, service logic, and API integration, including:
+The test suite currently covers customer and product schema validation, service logic, and API integration, including:
 
 - Successful customer creation.
 - Successful bulk customer creation.
-- Request data validation.
+- Successful product creation.
+- Successful bulk product creation.
+- Request data validation for customers and products.
+- Product type normalization and validation.
+- Product price validation.
 - Duplicate email handling.
 - Empty bulk creation requests.
 - Database persistence and data integrity.
@@ -376,7 +413,11 @@ The project is under active development.
 - Pydantic request and response schemas for customer creation.
 - Customer creation endpoint.
 - Bulk customer creation endpoint.
-- Unit and integration tests using pytest.
+- Pydantic request and response schemas for product creation.
+- Product creation endpoint.
+- Bulk product creation endpoint.
+- Product type normalization and validation.
+- Unit and integration tests for customer and product creation operations.
 - Dockerfile and Docker Compose configuration.
 - MySQL container with persistent data storage.
 - Dedicated testing database initialization.
@@ -386,5 +427,6 @@ The project is under active development.
 
 - Customer retrieval and update operations.
 - Customer activation and deactivation.
-- Product management endpoints.
+- Product retrieval and update operations.
+- Product activation and deactivation.
 - Order management endpoints.
